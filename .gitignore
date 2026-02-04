@@ -1,0 +1,22 @@
+# Yii2
+/vendor/
+/runtime/
+/web/assets/
+
+# Env
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker volumes
+dbdata/
+
+# Logs
+*.log
