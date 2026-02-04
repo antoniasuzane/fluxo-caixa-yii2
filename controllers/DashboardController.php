@@ -9,7 +9,6 @@ class DashboardController extends Controller
 {
     public function actionIndex($periodo = 'diario', $data = null)
     {
-        // data base (YYYY-MM-DD). se não vier, usa hoje
         $data = $data ?: date('Y-m-d');
 
         if ($periodo === 'mensal') {
@@ -22,21 +21,27 @@ class DashboardController extends Controller
             $tituloPeriodo = 'Dia: ' . date('d/m/Y', strtotime($data));
         }
 
-        $totalEntradas = (float) Lancamento::find()
+        $totalEntradas = (float) (Lancamento::find()
             ->where(['tipo' => 'entrada'])
             ->andWhere(['between', 'data', $inicio, $fim])
-            ->sum('valor');
+            ->sum('valor') ?? 0);
 
-        $totalSaidas = (float) Lancamento::find()
+        $totalSaidas = (float) (Lancamento::find()
             ->where(['tipo' => 'saida'])
             ->andWhere(['between', 'data', $inicio, $fim])
-            ->sum('valor');
+            ->sum('valor') ?? 0);
 
         $saldoPeriodo = $totalEntradas - $totalSaidas;
 
-        return $this->render('index', compact(
-            'periodo', 'data', 'inicio', 'fim', 'tituloPeriodo',
-            'totalEntradas', 'totalSaidas', 'saldoPeriodo'
-        ));
+        return $this->render('index', [
+            'periodo' => $periodo,
+            'data' => $data,
+            'inicio' => $inicio,
+            'fim' => $fim,
+            'tituloPeriodo' => $tituloPeriodo,
+            'totalEntradas' => $totalEntradas,
+            'totalSaidas' => $totalSaidas,
+            'saldoPeriodo' => $saldoPeriodo,
+        ]);
     }
 }
