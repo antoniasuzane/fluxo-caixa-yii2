@@ -104,17 +104,63 @@ $this->title = '📊 Resumo do Caixa';
     </div>
 </div>
 
-<!-- AÇÕES -->
-<div class="d-flex gap-2">
-    <?= Html::a(
-        '➕ Novo Lançamento',
-        ['/lancamento/create'],
-        ['class' => 'btn btn-success']
-    ) ?>
+<!-- ÚLTIMOS LANÇAMENTOS -->
+<div class="card mt-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <strong>Últimos lançamentos do período</strong>
+        <?= Html::a('Ver todos', ['/lancamento/index'], ['class' => 'btn btn-sm btn-outline-primary']) ?>
+    </div>
 
-    <?= Html::a(
-        '📋 Ver Lançamentos',
-        ['/lancamento/index'],
-        ['class' => 'btn btn-primary']
-    ) ?>
+    <div class="card-body p-0">
+        <?php if (empty($ultimosLancamentos)): ?>
+            <div class="p-3">
+                <em>Nenhum lançamento encontrado para este período.</em>
+            </div>
+        <?php else: ?>
+            <div class="table-responsive">
+                <table class="table table-striped mb-0">
+                    <thead>
+                        <tr>
+                            <th style="width: 140px;">Data</th>
+                            <th>Descrição</th>
+                            <th style="width: 120px;">Tipo</th>
+                            <th style="width: 160px;" class="text-end">Valor</th>
+                            <th style="width: 180px;">Pagamento</th>
+                            <th style="width: 140px;">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($ultimosLancamentos as $l): ?>
+                            <?php
+                                $isEntrada = $l->tipo === 'entrada';
+                                $tipoLabel = $isEntrada ? 'Entrada' : 'Saída';
+                                $tipoStyle = $isEntrada
+                                    ? 'color: green; font-weight:700;'
+                                    : 'color: red; font-weight:700;';
+                            ?>
+                            <tr>
+                                <td><?= Html::encode(date('d/m/Y', strtotime($l->data))) ?></td>
+                                <td><?= Html::encode($l->descricao) ?></td>
+                                <td style="<?= $tipoStyle ?>"><?= Html::encode($tipoLabel) ?></td>
+                                <td class="text-end" style="<?= $tipoStyle ?>">
+                                    R$ <?= number_format($l->valor, 2, ',', '.') ?>
+                                </td>
+                                <td><?= Html::encode($l->forma_pagamento) ?></td>
+                                <td>
+                                    <?= Html::a('Ver', ['/lancamento/view', 'id' => $l->id], ['class' => 'btn btn-sm btn-outline-secondary']) ?>
+                                    <?= Html::a('Editar', ['/lancamento/update', 'id' => $l->id], ['class' => 'btn btn-sm btn-outline-dark ms-1']) ?>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
+
+<!-- AÇÕES -->
+<div class="mt-4 d-flex gap-2">
+    <?= Html::a('➕ Novo Lançamento', ['/lancamento/create'], ['class' => 'btn btn-success']) ?>
+    <?= Html::a('📋 Ver Lançamentos', ['/lancamento/index'], ['class' => 'btn btn-primary']) ?>
 </div>

@@ -48,6 +48,13 @@ class DashboardController extends Controller
 
         $saldoAcumulado = $totalEntradasAte - $totalSaidasAte;
 
+        // Últimos lançamentos do período (ex: 10)
+        $ultimosLancamentos = Lancamento::find()
+            ->where(['between', 'data', $inicio, $fim])
+            ->orderBy(['data' => SORT_DESC, 'id' => SORT_DESC])
+            ->limit(10)
+            ->all();
+
         return $this->render('index', compact(
             'periodo',
             'data',
@@ -57,7 +64,8 @@ class DashboardController extends Controller
             'totalEntradas',
             'totalSaidas',
             'saldoPeriodo',
-            'saldoAcumulado'
+            'saldoAcumulado',
+            'ultimosLancamentos'
         ));
     }
 }
