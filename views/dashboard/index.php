@@ -7,12 +7,12 @@ $this->title = '📊 Resumo do Caixa';
 
 <h1><?= Html::encode($this->title) ?></h1>
 
-<!-- FILTRO DE DATA + PERÍODO -->
+<!-- FILTRO DE DATA + FORMA + PERÍODO -->
 <div class="row mb-4">
-    <div class="col-md-6">
-        <?= Html::label('Data base', 'data-base', ['class' => 'form-label']) ?>
+    <div class="col-md-7">
+        <?= Html::label('Filtros', 'data-base', ['class' => 'form-label']) ?>
 
-        <form class="d-flex gap-2" method="get">
+        <form class="d-flex flex-wrap gap-2" method="get">
             <input type="hidden" name="r" value="dashboard/index">
             <input type="hidden" name="periodo" value="<?= Html::encode($periodo) ?>">
 
@@ -21,8 +21,16 @@ $this->title = '📊 Resumo do Caixa';
                 type="date"
                 name="data"
                 class="form-control"
+                style="max-width: 200px;"
                 value="<?= Html::encode($data) ?>"
             >
+
+            <select name="forma" class="form-select" style="max-width: 220px;">
+                <option value="" <?= $forma === '' ? 'selected' : '' ?>>Todas as formas</option>
+                <option value="dinheiro" <?= $forma === 'dinheiro' ? 'selected' : '' ?>>Dinheiro</option>
+                <option value="pix" <?= $forma === 'pix' ? 'selected' : '' ?>>Pix</option>
+                <option value="cartao" <?= $forma === 'cartao' ? 'selected' : '' ?>>Cartão</option>
+            </select>
 
             <button class="btn btn-outline-dark" type="submit">
                 Aplicar
@@ -34,25 +42,28 @@ $this->title = '📊 Resumo do Caixa';
         </small>
     </div>
 
-    <div class="col-md-6 d-flex align-items-end justify-content-md-end mt-3 mt-md-0">
+    <div class="col-md-5 d-flex align-items-end justify-content-md-end mt-3 mt-md-0">
         <div class="btn-group">
             <?= Html::a(
                 '📅 Diário',
-                ['index', 'periodo' => 'diario', 'data' => $data],
+                ['index', 'periodo' => 'diario', 'data' => $data, 'forma' => $forma],
                 ['class' => 'btn btn-outline-primary ' . ($periodo === 'diario' ? 'active' : '')]
             ) ?>
 
             <?= Html::a(
                 '📆 Mensal',
-                ['index', 'periodo' => 'mensal', 'data' => $data],
+                ['index', 'periodo' => 'mensal', 'data' => $data, 'forma' => $forma],
                 ['class' => 'btn btn-outline-secondary ' . ($periodo === 'mensal' ? 'active' : '')]
             ) ?>
         </div>
     </div>
 </div>
 
-<p>
+<p class="mb-1">
     <strong><?= Html::encode($tituloPeriodo) ?></strong>
+</p>
+<p class="text-muted mb-4">
+    Forma de pagamento: <strong><?= Html::encode($formaLabel ?? 'Todas') ?></strong>
 </p>
 
 <!-- CARDS RESUMO -->
@@ -114,7 +125,7 @@ $this->title = '📊 Resumo do Caixa';
     <div class="card-body p-0">
         <?php if (empty($ultimosLancamentos)): ?>
             <div class="p-3">
-                <em>Nenhum lançamento encontrado para este período.</em>
+                <em>Nenhum lançamento encontrado para este período com os filtros selecionados.</em>
             </div>
         <?php else: ?>
             <div class="table-responsive">
@@ -137,6 +148,11 @@ $this->title = '📊 Resumo do Caixa';
                                 $tipoStyle = $isEntrada
                                     ? 'color: green; font-weight:700;'
                                     : 'color: red; font-weight:700;';
+                                $formaBonita = [
+                                    'dinheiro' => 'Dinheiro',
+                                    'pix' => 'Pix',
+                                    'cartao' => 'Cartão',
+                                ][$l->forma_pagamento] ?? $l->forma_pagamento;
                             ?>
                             <tr>
                                 <td><?= Html::encode(date('d/m/Y', strtotime($l->data))) ?></td>
@@ -145,7 +161,7 @@ $this->title = '📊 Resumo do Caixa';
                                 <td class="text-end" style="<?= $tipoStyle ?>">
                                     R$ <?= number_format($l->valor, 2, ',', '.') ?>
                                 </td>
-                                <td><?= Html::encode($l->forma_pagamento) ?></td>
+                                <td><?= Html::encode($formaBonita) ?></td>
                                 <td>
                                     <?= Html::a('Ver', ['/lancamento/view', 'id' => $l->id], ['class' => 'btn btn-sm btn-outline-secondary']) ?>
                                     <?= Html::a('Editar', ['/lancamento/update', 'id' => $l->id], ['class' => 'btn btn-sm btn-outline-dark ms-1']) ?>
